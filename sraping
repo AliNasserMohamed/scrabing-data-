@@ -1,0 +1,36 @@
+import requests
+import csv
+import json
+from bs4 import BeautifulSoup
+r=requests.get("https://fashion.souq.com/eg-ar/watches/c/15216")
+soup=BeautifulSoup(r.content,"lxml")
+json_file=open("souq.json","w",encoding="utf-8")
+csv_file=open("sou.csv","w",encoding="utf-8")
+unit=soup.find_all("div",{"class":"column column-block block-grid-large"})
+field=["name","price","picture"]
+csv_writer=csv.DictWriter(csv_file,fieldnames=field)
+csv_writer.writeheader()
+data={}
+json_file.write("[\n")
+print("1")
+for x in unit:
+    nam=x.find("h6",{"class":"title"})
+    price=x.find("span",{"class":"is block sk-clr1"})
+    img=x.find("img",class_="img-size-medium")
+
+    print(1)
+    if img:
+      csv_writer.writerow({"name":nam.text.replace('', '').strip('\r\n'),"price":price.text,"picture":img["data-src"]})
+      data["name"]=nam.text.replace('                    ', '').strip('\r\n')
+      data['price']=price.text
+      data["img"]=img["data-src"]
+      file_js=json.dumps(data,ensure_ascii=False,indent=2)
+      json_file.write(file_js)
+json_file.write("\n ]")
+json_file.close()
+csv_file.close()
+    #y=nam.find("a")
+   # print(y.text.replace('                    ', ''))
+
+
+
